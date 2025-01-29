@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div style="background: linear-gradient(to bottom, #f8f9fa, #e9ecef); min-height: 100vh; padding: 20px; display: flex; flex-direction: column; align-items: center;">
+    <h1 style="text-align: center; font-family: Arial, sans-serif; color: #333;">Witaj, {{ session['username'] }}</h1>
+
+   
+    <div style="margin: 20px 0; width: 50%; max-width: 600px;">
+        <form method="POST" action="{{ url_for('post') }}" style="display: flex; flex-direction: column; gap: 10px;">
+            <textarea 
+                name="content" 
+                placeholder="Tutaj napisz swój post :)" 
+                style="width: 100%; height: 100px; padding: 10px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; white-space: normal;"
+                required></textarea>
+            <button 
+                type="submit" 
+                style="background-color: #90EE90;
+                border: 2px solid #422800;
+                border-radius: 30px;
+                box-shadow: #422800 4px 4px 0 0;
+                color: #422800;
+                cursor: pointer;
+                display: inline-block;
+                font-weight: 600;
+                font-size: 18px;
+                padding: 0 18px;
+                line-height: 50px;
+                text-align: center;
+                touch-action: manipulation;">
+                Opublikuj
+            </button>
+        </form>
+    </div>
+
+    
+    <div style="width: 50%; max-width: 600px;">
+        {% for post in posts %}
+        <div style="background: white; padding: 20px; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);">
+            <p style="font-size: 18px; margin-bottom: 10px; word-wrap: break-word;">{{ post.content }}</p>
+            <small style="color: #666;">Autor: {{ post.user.username }}</small>
+            
+            
+            {% if session['user_id'] == post.user_id %}
+            <div style="margin-top: 10px;">
+                <a href="{{ url_for('delete_post', post_id=post.id) }}" 
+                   style="color: #dc3545; text-decoration: none; font-size: 14px;">Usuń</a>
+            </div>
+            {% endif %}
+
+            
+            <hr>
+            <div style="margin-top: 15px;">
+                <h4 style="font-size: 16px; color: #333; margin-bottom: 10px;">Komentarze:</h4>
+                {% for comment in post.comments %}
+                <div style="margin-bottom: 10px; padding: 10px; background-color: #f9f9f9; border-radius: 5px;">
+                    <p style="margin: 0; word-wrap: break-word;">{{ comment.content }}</p>
+                    <small style="color: #666;">Autor: {{ comment.user.username }}</small>
+
+                   
+                    {% if session['user_id'] == comment.user_id %}
+                    <div style="margin-top: 5px;">
+                        <a href="{{ url_for('delete_comment', comment_id=comment.id) }}" 
+                           style="color: #dc3545; text-decoration: none; font-size: 14px;">Usuń</a>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+
+                
+                <form method="POST" action="{{ url_for('comment', post_id=post.id) }}" style="margin-top: 15px;">
+                    <textarea 
+                        name="content" 
+                        placeholder="Dodaj komentarz..." 
+                        style="width: 100%; height: 60px; padding: 10px; border: 1px solid #ddd; border-radius: 5px; white-space: normal;"
+                        required></textarea>
+                    <button 
+                        type="submit" 
+                        style="background-color: #FFB6C1; color: white; border: none; padding: 8px 12px; border-radius: 5px; font-size: 14px; margin-top: 5px; cursor: pointer;">
+                        Skomentuj
+                    </button>
+                </form>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
